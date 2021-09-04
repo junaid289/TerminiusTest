@@ -11,13 +11,16 @@ import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class WeatherApiRestControllerTest {
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper om = new ObjectMapper();
@@ -38,6 +43,11 @@ class WeatherApiRestControllerTest {
     WeatherRepository weatherRepository;
     @Autowired
     private MockMvc mockMvc;
+
+    public void setup() {
+        weatherRepository.deleteAll();
+        //om.setDateFormat(simpleDateFormat);
+    }
 
     @BeforeEach
     void setUp() {
@@ -54,7 +64,6 @@ class WeatherApiRestControllerTest {
                 .contentType("application/json")
                 .content(om.writeValueAsString(getTestData().get("karachi"))))
                 .andDo(print())
-                .andExpect(jsonPath("$.id", greaterThan(0)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(), WeatherDto.class);
 
         assertTrue(new ReflectionEquals(expectedRecord, "id").matches(actualRecord));
@@ -84,7 +93,7 @@ class WeatherApiRestControllerTest {
         });
 
         for (int i = 0; i < expectedRecords.size(); i++) {
-            assertTrue(new ReflectionEquals(expectedRecords.get(i)).matches(actualRecords.get(i)));
+            assertTrue(new ReflectionEquals(expectedRecords.get(i), "id").matches(actualRecords.get(i)));
         }
     }
 
