@@ -12,5 +12,5 @@ import java.util.Optional;
 @Repository
 public interface WeatherRepository extends JpaRepository<Weather, Integer> {
 
-    public List<Weather> findAllByDateAndCity(Optional<Date> date, Optional<String[]> cities, Sort sort);
+    public List<Weather> findAllByCity(String city, Sort sort);
 }

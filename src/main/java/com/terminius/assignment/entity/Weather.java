@@ -27,17 +27,17 @@ public class Weather {
     private Float lat;
     private Float lon;
     private String city;
-    private String state;
+    private String province;
 
     @ElementCollection
     private List<Double> temperatures;
 
-    public Weather(Date date, Float lat, Float lon, String city, String state, List<Double> temperatures) {
+    public Weather(Date date, Float lat, Float lon, String city, String province, List<Double> temperatures) {
         this.date = date;
         this.lat = lat;
         this.lon = lon;
         this.city = city;
-        this.state = state;
+        this.province = province;
         this.temperatures = temperatures;
     }
 }
